@@ -7,6 +7,7 @@
 #include <units/units.h>
 
 #include "psf.h"
+// TODO: what is rf image??
 
 /**
  * Radio-frequency image.
@@ -56,6 +57,7 @@ public:
         // Travel through each column looking for concave peaks.
         // Then, recalculate the points between the peaks as the linear interpolation of the absolute values of those peaks.
         // This should work as a fast approximation of the hilbert transform over the rf signal.
+        // TODO: is it reasonable to interpolate two neighbouring peaks because of the existing valleys???
 
         for (size_t column = 0; column < columns; column++)
         {
@@ -89,7 +91,8 @@ public:
             }
         }
     }
-
+    
+    //TODO: don't think the convolution is reasoning???? especially the axial range and lateral range
     template <typename psf_>
     void convolve(const psf_ & p)
     {
@@ -177,6 +180,7 @@ private:
     static constexpr unsigned int max_rows = (speed_of_sound * max_travel_time) / axial_resolution;
 
     // fills map_x and map_y
+    // radius: the transducer radius without the ultrasound image area
     void create_mapping(units::length::millimeter_t radius, units::angle::radian_t total_angle, unsigned int rf_width, unsigned int rf_height)
     {
         // ratio to convert from mm to px

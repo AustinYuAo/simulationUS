@@ -25,7 +25,7 @@ constexpr centimeter_t transducer_radius = 3_cm;
 constexpr centimeter_t ultrasound_depth = 15_cm; // [15cm -> μm]
 constexpr microsecond_t max_travel_time = microsecond_t(ultrasound_depth / speed_of_sound); // [μs]
 
-constexpr unsigned int resolution = 145;//145; // [μm], from Burger13
+constexpr unsigned int resolution = 145;//145; // [μm], from Burger13 (???)
 using psf_ = psf<7, 13, 7, resolution>;
 using volume_ = volume<256, resolution>;
 using rf_image_ = rf_image<transducer_elements, max_travel_time.to<unsigned int>(), static_cast<unsigned int>(axial_resolution.to<float>()*1000.0f/*mm->μm*/)>;
@@ -43,7 +43,7 @@ int main(int argc, char** argv)
 
     const psf_ psf { transducer_frequency, 0.05f, 0.2f, 0.1f };
 
-    rf_image_ rf_image { transducer_radius, transducer_amplitude };
+    rf_image_ rf_image { transducer_radius, transducer_amplitude }; // TODO: the transducer_radius measure unit should be millimeter but our input looks like centermeter 
 
     nlohmann::json json;
     {
@@ -58,6 +58,7 @@ int main(int argc, char** argv)
     const auto & t_dir = json.at("transducerAngles");
     std::array<units::angle::degree_t, 3> transducer_angles = {degree_t((float)t_dir[0]), degree_t((float)t_dir[1]), degree_t((float)t_dir[2])};
 
+    //TODO: ???
     transducer_ transducer(transducer_frequency, transducer_radius, transducer_element_separation,
                            btVector3(t_pos[0], t_pos[1], t_pos[2]), transducer_angles);
     //btVector3(-17.0, 1.2, 6.45) // liver
@@ -91,7 +92,7 @@ int main(int argc, char** argv)
                     auto time_elapsed = starting_micros;
                     auto intensity = segment.initial_intensity;
 
-                    for (unsigned int step = 0; step < steps && time_elapsed < max_travel_time; step++)
+                    for (unsigned int step = 0; (step < steps) && (time_elapsed < max_travel_time); step++)
                     {
                         float scattering = texture_volume.get_scattering(segment.media.mu1, segment.media.mu0, segment.media.sigma, point.x(), point.y(), point.z());
 
@@ -100,7 +101,7 @@ int main(int argc, char** argv)
                         // Step forward through the segment, decreasing intensity using Beer-Lambert's law
                         point += delta_step;
                         time_elapsed = time_elapsed + time_step;
-
+                        // TODO: the distance from sorce looks wrong, should be changed???
                         constexpr auto k = 1.0f;
                         intensity *= std::exp(-segment.attenuation * axial_resolution.to<float>()*0.01f * transducer_frequency * k);
                     }

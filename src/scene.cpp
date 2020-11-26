@@ -122,7 +122,7 @@ std::array<std::vector<ray_physics::segment>, ray_count> scene::cast_rays()
 
                         auto result = ray_physics::hit_boundary(ray_, closestResults.m_hitPointWorld, closestResults.m_hitNormalWorld, *organ);
 
-                        // Register collision creating a segment from the beggining of the ray to the collision point
+                        // Register collision creating a segment from the beginning of the ray to the collision point
                         segments_vector.emplace_back(segment{ray_.from, closestResults.m_hitPointWorld, ray_.direction, result.reflected_intensity, intensity_before_hit, ray_.media.attenuation, distance_before_hit, ray_.media});
 
                         // Spawn reflection and refraction rays
